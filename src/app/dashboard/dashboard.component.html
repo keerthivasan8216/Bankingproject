@@ -1,0 +1,228 @@
+<div class="dashboard">
+
+  <!-- Header -->
+  <div class="dashboard-header">
+
+    <div>
+      <h1>Banking Dashboard</h1>
+
+      <p>
+        Welcome back, {{ accountName }}
+      </p>
+    </div>
+
+
+    <div class="account-info">
+
+      <span>Account</span>
+
+      <strong>
+        {{ accountNumber | maskAccount }}
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- Balance Card -->
+  <div class="balance-card">
+
+    <div>
+
+      <p>Available Balance</p>
+
+      <h2>
+
+        @if (showBalance) {
+
+          {{ balance | currency:'INR':'symbol':'1.2-2' }}
+
+        } @else {
+
+          ₹******.**
+
+        }
+
+      </h2>
+
+
+      <button
+        type="button"
+        class="balance-toggle"
+        (click)="toggleBalance()">
+
+        {{ showBalance ? 'Hide Balance' : 'Show Balance' }}
+
+      </button>
+
+    </div>
+
+
+    <div class="balance-icon">
+      ₹
+    </div>
+
+  </div>
+
+
+  <!-- Statistics -->
+  <div class="stats">
+
+
+    <!-- Total Deposits -->
+    <div class="stat-card">
+
+      <p>Total Deposits</p>
+
+      <h3>
+
+        @if (showBalance) {
+
+          {{ totalDeposits | currency:'INR':'symbol':'1.2-2' }}
+
+        } @else {
+
+          ₹******.**
+
+        }
+
+      </h3>
+
+    </div>
+
+
+    <!-- Total Withdrawals -->
+    <div class="stat-card">
+
+      <p>Total Withdrawals</p>
+
+      <h3>
+
+        @if (showBalance) {
+
+          {{ totalWithdrawals | currency:'INR':'symbol':'1.2-2' }}
+
+        } @else {
+
+          ₹******.**
+
+        }
+
+      </h3>
+
+    </div>
+
+
+    <!-- Current Balance -->
+    <div class="stat-card">
+
+      <p>Current Balance</p>
+
+      <h3>
+
+        @if (showBalance) {
+
+          {{ balance | currency:'INR':'symbol':'1.2-2' }}
+
+        } @else {
+
+          ₹******.**
+
+        }
+
+      </h3>
+
+    </div>
+
+  </div>
+
+
+  <!-- Transaction Section -->
+  <div class="transaction-card">
+
+    <h2>Make a Transaction</h2>
+
+
+    <!-- Transaction Type -->
+    <div class="form-group">
+
+      <label>
+        Transaction Type
+      </label>
+
+
+      <select
+        [(ngModel)]="transactionType">
+
+        <option value="deposit">
+          Deposit
+        </option>
+
+        <option value="withdraw">
+          Withdraw
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- Amount -->
+    <div class="form-group">
+
+      <label>
+        Amount
+      </label>
+
+
+      <input
+        type="number"
+        [(ngModel)]="amount"
+        placeholder="Enter amount"
+        min="1"
+      />
+
+    </div>
+
+
+    <!-- Transaction Button -->
+    <button
+      type="button"
+      (click)="performTransaction()">
+
+      {{ transactionType === 'deposit'
+          ? 'Deposit Money'
+          : 'Withdraw Money' }}
+
+    </button>
+
+
+    <!-- Message -->
+    @if (message) {
+
+      <p class="message">
+        {{ message }}
+      </p>
+
+    }
+
+  </div>
+
+
+  <!-- Navigation -->
+  <div class="navigation-buttons">
+
+
+    <button
+      type="button"
+      (click)="goToTransfer()">
+
+      Transfer Money
+
+    </button>
+
+  </div>
+
+</div>
+
