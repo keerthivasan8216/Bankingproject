@@ -1,0 +1,104 @@
+<div class="login-container">
+
+  <div class="login-card">
+
+    <h2>Banking Login</h2>
+
+    <p class="subtitle">
+      Login to your account
+    </p>
+
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()">
+
+      <!-- Username -->
+
+      <div class="form-group">
+
+        <label>Username</label>
+
+        <input
+          type="text"
+          formControlName="username"
+           placeholder="Enter keerthi for username 123456 for password"
+        />
+
+        <small
+          class="error"
+          *ngIf="
+            username?.touched &&
+            username?.hasError('required')
+          ">
+
+          Username is required.
+
+        </small>
+
+        <small
+          class="error"
+          *ngIf="
+            username?.touched &&
+            username?.hasError('minlength')
+          ">
+
+          Username must contain at least 3 characters.
+
+        </small>
+
+      </div>
+
+
+      <!-- Password -->
+
+      <div class="form-group">
+
+        <label>Password</label>
+
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="Enter your password"
+        />
+
+        <small
+          class="error"
+          *ngIf="
+            password?.touched &&
+            password?.hasError('required')
+          ">
+
+          Password is required.
+
+        </small>
+
+        <small
+          class="error"
+          *ngIf="
+            password?.touched &&
+            password?.hasError('minlength')
+          ">
+
+          Password must contain at least 6 characters.
+
+        </small>
+
+      </div>
+
+
+      <!-- Login button -->
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid">
+
+        Login
+
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+

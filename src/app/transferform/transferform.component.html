@@ -1,0 +1,388 @@
+<div class="transfer-page">
+
+  <!-- Header -->
+  <div class="page-header">
+
+    <div>
+      <p class="eyebrow">BANKING</p>
+      <h1>Transfer Money</h1>
+      <p class="subtitle">
+        Send money securely to another account
+      </p>
+    </div>
+
+    <div class="balance-card">
+
+      <span>Available Balance</span>
+
+      <strong>
+        ₹{{ balance | number:'1.2-2' }}
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- Main Card -->
+  <div class="transfer-card">
+
+    <div class="card-header">
+
+      <div>
+        <h2>Make a Transfer</h2>
+
+        <p>
+          Enter the recipient details and transfer amount.
+        </p>
+      </div>
+
+      <div class="secure-badge">
+        🔒 Secure
+      </div>
+
+    </div>
+
+
+    <form
+      [formGroup]="transferForm"
+      (ngSubmit)="submitTransfer()">
+
+
+      <!-- Sender Account -->
+      <div class="sender-section">
+
+        <div class="section-title">
+
+          <span class="step-number">1</span>
+
+          <div>
+            <h3>From Account</h3>
+
+            <p>
+              Your account
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="account-box">
+
+          <div class="account-icon">
+            ₹
+          </div>
+
+          <div>
+
+            <span class="account-label">
+              Sender Account
+            </span>
+
+            <strong>
+              {{ currentAccountNumber }}
+            </strong>
+
+          </div>
+
+          <span class="verified">
+            ✓ Active
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Beneficiaries -->
+      <div
+        class="beneficiary-section"
+        formArrayName="beneficiaries">
+
+        <div class="section-title">
+
+          <span class="step-number">2</span>
+
+          <div>
+            <h3>To Account</h3>
+
+            <p>
+              Enter recipient details
+            </p>
+          </div>
+
+        </div>
+
+
+        @for (
+          beneficiary of beneficiaries.controls;
+          track $index
+        ) {
+
+          <div
+            class="beneficiary-card"
+            [formGroupName]="$index">
+
+
+            <!-- Beneficiary Header -->
+            <div class="beneficiary-header">
+
+              <div>
+
+                <span class="beneficiary-number">
+                  BENEFICIARY {{ $index + 1 }}
+                </span>
+
+                <h4>
+                  Recipient Details
+                </h4>
+
+              </div>
+
+
+              @if (beneficiaries.length > 1) {
+
+                <button
+                  type="button"
+                  class="remove-button"
+                  (click)="removeBeneficiary($index)">
+
+                  × Remove
+
+                </button>
+
+              }
+
+            </div>
+
+
+            <div class="input-row">
+
+
+              <!-- Account Number -->
+              <div class="input-group">
+
+                <label>
+                  Account Number
+                </label>
+
+                <div class="input-wrapper">
+
+                  <span class="input-icon">
+                    #
+                  </span>
+
+                  <input
+                    type="text"
+                    formControlName="accountNumber"
+                    placeholder="Enter account number"
+                  />
+
+                </div>
+
+
+                @if (
+                  beneficiary.get('accountNumber')?.touched &&
+                  beneficiary.get('accountNumber')?.hasError('required')
+                ) {
+
+                  <small class="error">
+                    Account number is required.
+                  </small>
+
+                }
+
+
+                @if (
+                  beneficiary.get('accountNumber')?.touched &&
+                  beneficiary.get('accountNumber')?.hasError('pattern')
+                ) {
+
+                  <small class="error">
+                    Please enter a valid account number.
+                  </small>
+
+                }
+
+              </div>
+
+
+              <!-- Amount -->
+              <div class="input-group">
+
+                <label>
+                  Transfer Amount
+                </label>
+
+                <div class="input-wrapper">
+
+                  <span class="currency-symbol">
+                    ₹
+                  </span>
+
+                  <input
+                    type="number"
+                    formControlName="amount"
+                    placeholder="0.00"
+                    min="100"
+                  />
+
+                </div>
+
+
+                <small class="hint">
+                  Minimum transfer amount: ₹100
+                </small>
+
+
+                @if (
+                  beneficiary.get('amount')?.touched &&
+                  beneficiary.get('amount')?.hasError('required')
+                ) {
+
+                  <small class="error">
+                    Amount is required.
+                  </small>
+
+                }
+
+
+                @if (
+                  beneficiary.get('amount')?.touched &&
+                  beneficiary.get('amount')?.hasError('min')
+                ) {
+
+                  <small class="error">
+                    Minimum amount is ₹100.
+                  </small>
+
+                }
+
+              </div>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- Add Beneficiary -->
+        <button
+          type="button"
+          class="add-beneficiary"
+          (click)="addBeneficiary()">
+
+          <span class="plus">
+            +
+          </span>
+
+          Add Another Beneficiary
+
+        </button>
+
+      </div>
+
+
+      <!-- Transfer Summary -->
+      <div class="summary-card">
+
+        <div class="summary-title">
+          Transfer Summary
+        </div>
+
+        <div class="summary-row">
+
+          <span>
+            Number of beneficiaries
+          </span>
+
+          <strong>
+            {{ beneficiaries.length }}
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+          <span>
+            Total transfer amount
+          </span>
+
+          <strong class="total-amount">
+
+            ₹{{
+              beneficiaries.value
+                | json
+            }}
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- Message -->
+      @if (message) {
+
+        <div
+          class="message"
+          [class.error-message]="message.includes('failed') || message.includes('Insufficient')">
+
+          <span>
+            {{ message }}
+          </span>
+
+        </div>
+
+      }
+
+
+      <!-- Actions -->
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          class="transfer-button"
+          [disabled]="loading || transferForm.invalid">
+
+          @if (loading) {
+
+            <span class="spinner"></span>
+
+            Processing...
+
+          } @else {
+
+            <span>
+              ₹
+            </span>
+
+            Transfer Money
+
+          }
+
+        </button>
+
+      </div>
+
+
+      <!-- Security Note -->
+      <div class="security-note">
+
+        <span>🔒</span>
+
+        <p>
+          Your transfer information is processed securely.
+          Please review the recipient and amount before confirming.
+        </p>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
