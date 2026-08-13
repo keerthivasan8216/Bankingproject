@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Task App</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        h2 {
+            color: #444;
+        }
+
+        .section {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+        }
+
+        input {
+            padding: 8px;
+            width: 300px;
+            margin: 5px 0;
+        }
+
+        button {
+            padding: 9px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        pre {
+            background-color: #eee;
+            padding: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        hr {
+            margin: 30px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Task App</h1>
+
+
+    <!-- ================================= -->
+    <!-- CREATE USER -->
+    <!-- ================================= -->
+
+    <div class="section">
+
+        <h2>Create User</h2>
+
+        <input
+            id="name"
+            placeholder="Name"
+        >
+
+        <br>
+
+        <input
+            id="email"
+            placeholder="Email"
+        >
+
+        <br>
+
+        <input
+            id="password"
+            type="password"
+            placeholder="Password"
+        >
+
+        <br>
+
+        <button onclick="createUser()">
+            Create User
+        </button>
+
+        <pre id="result"></pre>
+
+    </div>
+
+
+
+    <!-- ================================= -->
+    <!-- CREATE TASK -->
+    <!-- ================================= -->
+
+    <div class="section">
+
+        <h2>Create Task</h2>
+
+        <input
+            id="description"
+            placeholder="Task description"
+        >
+
+        <br>
+
+        <button onclick="createTask()">
+            Create Task
+        </button>
+
+        <pre id="taskResult"></pre>
+
+    </div>
+
+
+
+    <!-- ================================= -->
+    <!-- GET TASKS -->
+    <!-- ================================= -->
+
+    <div class="section">
+
+        <h2>Get Tasks</h2>
+
+        <button onclick="getTasks()">
+            Get All Tasks
+        </button>
+
+        <button onclick="getCompletedTasks()">
+            Get Completed Tasks
+        </button>
+
+        <button onclick="getIncompleteTasks()">
+            Get Incomplete Tasks
+        </button>
+
+        <pre id="tasksResult"></pre>
+
+    </div>
+
+
+
+    <!-- ================================= -->
+    <!-- MARK TASK COMPLETED -->
+    <!-- ================================= -->
+
+    <div class="section">
+
+        <h2>Mark Task as Completed</h2>
+
+        <input
+            id="taskId"
+            placeholder="Enter Task ID"
+        >
+
+        <br>
+
+        <button onclick="completeTask()">
+            Mark Completed
+        </button>
+
+        <pre id="completeResult"></pre>
+
+    </div>
+
+
+
+    <!-- ================================= -->
+    <!-- PAGINATION -->
+    <!-- ================================= -->
+
+    <div class="section">
+
+        <h2>Pagination</h2>
+
+        <label>Limit:</label>
+
+        <br>
+
+        <input
+            id="limit"
+            type="number"
+            value="5"
+        >
+
+        <br>
+
+        <label>Skip:</label>
+
+        <br>
+
+        <input
+            id="skip"
+            type="number"
+            value="0"
+        >
+
+        <br>
+
+        <button onclick="getPaginatedTasks()">
+            Get Paginated Tasks
+        </button>
+
+        <pre id="paginationResult"></pre>
+
+    </div>
+
+
+
+    <!-- ================================= -->
+    <!-- SORTING -->
+    <!-- ================================= -->
+
+    <div class="section">
+
+        <h2>Sorting</h2>
+
+        <button onclick="sortNewest()">
+            Newest First
+        </button>
+
+        <button onclick="sortOldest()">
+            Oldest First
+        </button>
+
+        <pre id="sortingResult"></pre>
+
+    </div>
+
+
+
+    <!-- ================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ================================= -->
+
+    <script>
+
+        // ==========================================
+        // JWT TOKEN
+        // ==========================================
+
+        let token = "";
+
+
+        // ==========================================
+        // CREATE USER
+        // ==========================================
+
+        async function createUser() {
+
+            const name =
+                document.getElementById("name").value;
+
+            const email =
+                document.getElementById("email").value;
+
+            const password =
+                document.getElementById("password").value;
+
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:3000/users",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            password: password
+                        })
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                // Save JWT token
+                token = data.token;
+
+
+                document.getElementById("result").textContent =
+                    JSON.stringify(data, null, 2);
+
+            } catch (error) {
+
+                document.getElementById("result").textContent =
+                    error.message;
+
+            }
+        }
+
+
+
+        // ==========================================
+        // CREATE TASK
+        // ==========================================
+
+        async function createTask() {
+
+            if (!token) {
+
+                document.getElementById("taskResult").textContent =
+                    "Please create a user first.";
+
+                return;
+            }
+
+
+            const description =
+                document.getElementById("description").value;
+
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:3000/tasks",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json",
+
+                            "Authorization": "Bearer " + token
+                        },
+
+                        body: JSON.stringify({
+                            description: description
+                        })
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                document.getElementById("taskResult").textContent =
+                    JSON.stringify(data, null, 2);
+
+            } catch (error) {
+
+                document.getElementById("taskResult").textContent =
+                    error.message;
+
+            }
+        }
+
+
+
+        // ==========================================
+        // GET ALL TASKS
+        // ==========================================
+
+        async function getTasks() {
+
+            if (!token) {
+
+                document.getElementById("tasksResult").textContent =
+                    "Please create a user first.";
+
+                return;
+            }
+
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:3000/tasks",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                document.getElementById("tasksResult").textContent =
+                    JSON.stringify(data, null, 2);
+
+            } catch (error) {
+
+                document.getElementById("tasksResult").textContent =
+                    error.message;
+
+            }
+        }
+
+
+
+        // ==========================================
+        // GET COMPLETED TASKS
+        // ==========================================
+
+        async function getCompletedTasks() {
+
+            if (!token) {
+
+                document.getElementById("tasksResult").textContent =
+                    "Please create a user first.";
+
+                return;
+            }
+
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:3000/tasks?completed=true",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                document.getElementById("tasksResult").textContent =
+                    JSON.stringify(data, null, 2);
+
+            } catch (error) {
+
+                document.getElementById("tasksResult").textContent =
+                    error.message;
+
+            }
+        }
+
+
+
+        // ==========================================
+        // GET INCOMPLETE TASKS
+        // ==========================================
+
+        async function getIncompleteTasks() {
+
+            if (!token) {
+
+                document.getElementById("tasksResult").textContent =
+                    "Please create a user first.";
+
+                return;
+            }
+
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:3000/tasks?completed=false",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                document.getElementById("tasksResult").textContent =
+                    JSON.stringify(data, null, 2);
+
+            } catch (error) {
+
+                document.getElementById("tasksResult").textContent =
+                    error.message;
+
+            }
+        }
+
+
+
+        // ==========================================
+        // MARK TASK COMPLETED
+        // ==========================================
+
+        async function completeTask() {
+
+            if (!token) {
+
+                document.getElementById("completeResult").textContent =
+                    "Please create a user first.";
+
+                return;
+            }
+
+
+            const taskId =
+                document.getElementById("taskId").value;
+
+
+            if (!taskId) {
+
+                document.getElementById("completeResult").textContent =
+                    "Please enter a Task ID.";
+
+                return;
+            }
+
+
+            try {
+
+                const response = await fetch(
+                    `http://localhost:3000/tasks/${taskId}`,
+                    {
+                        method: "PATCH",
+
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                document.getElementById("completeResult").textContent =
+                    JSON.stringify(data, null, 2);
+
+            } catch (error) {
+
+                document.getElementById("completeResult").textContent =
+                    error.message;
+
+            }
+        }
+
+
+
+        // ==========================================
+        // PAGINATION
+        // ==========================================
+
+        async function getPaginatedTasks() {
+
+            if (!token) {
+
+                document.getElementById("paginationResult").textContent =
+                    "Please create a user first.";
+
+                return;
+            }
+
+
+            const limit =
+                document.getElementById("limit").value;
+
+            const skip =
+                document.getElementById("skip").value;
+
+
+            const url =
+                `http://localhost:3000/tasks?limit=${limit}&skip=${skip}`;
+
+
+            try {
+
+                const response = await fetch(
+                    url,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                document.getElementById("paginationResult").textContent =
+                    JSON.stringify(data, null, 2);
+
+            } catch (error) {
+
+                document.getElementById("paginationResult").textContent =
+                    error.message;
+
+            }
+        }
+
+
+
+        // ==========================================
+        // SORT NEWEST
+        // ==========================================
+
+        async function sortNewest() {
+
+            if (!token) {
+
+                document.getElementById("sortingResult").textContent =
+                    "Please create a user first.";
+
+                return;
+            }
+
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:3000/tasks?sortBy=createdAt:desc",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                document.getElementById("sortingResult").textContent =
+                    JSON.stringify(data, null, 2);
+
+            } catch (error) {
+
+                document.getElementById("sortingResult").textContent =
+                    error.message;
+
+            }
+        }
+
+
+
+        // ==========================================
+        // SORT OLDEST
+        // ==========================================
+
+        async function sortOldest() {
+
+            if (!token) {
+
+                document.getElementById("sortingResult").textContent =
+                    "Please create a user first.";
+
+                return;
+            }
+
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:3000/tasks?sortBy=createdAt:asc",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                document.getElementById("sortingResult").textContent =
+                    JSON.stringify(data, null, 2);
+
+            } catch (error) {
+
+                document.getElementById("sortingResult").textContent =
+                    error.message;
+
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>
